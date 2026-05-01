@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diabetes Risk Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --violet:#6c47ff;--violet2:#a78bfa;--violet3:#ede9ff;
+  --teal:#0d9488;--teal2:#ccfbf1;
+  --red:#dc2626;--red2:#fee2e2;
+  --green:#16a34a;--green2:#dcfce7;
+  --amber:#d97706;--amber2:#fef3c7;
+  --muted:#64748b;--border:#e2e8f0;--surface:#f8fafc;--white:#fff;
+}
+body{
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+  background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);
+  display:flex;align-items:center;justify-content:center;
+  padding:2rem 1rem;overflow-x:hidden;
+}
+.orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:.35;pointer-events:none;z-index:0;animation:orbFloat 12s ease-in-out infinite alternate;}
+.orb1{width:400px;height:400px;background:#6c47ff;top:-100px;left:-100px;animation-delay:0s;}
+.orb2{width:350px;height:350px;background:#14b8a6;bottom:-80px;right:-80px;animation-delay:-4s;}
+.orb3{width:250px;height:250px;background:#a78bfa;top:40%;left:60%;animation-delay:-8s;}
+@keyframes orbFloat{from{transform:translate(0,0) scale(1);}to{transform:translate(40px,30px) scale(1.1);}}
+.particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.p{position:absolute;width:3px;height:3px;background:rgba(255,255,255,.4);border-radius:50%;animation:pFloat linear infinite;}
+@keyframes pFloat{0%{transform:translateY(100vh) rotate(0);opacity:0;}10%{opacity:1;}90%{opacity:.5;}100%{transform:translateY(-20px) rotate(720deg);opacity:0;}}
+.app{position:relative;z-index:1;width:100%;max-width:580px;}
+.badge{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(108,71,255,.25);border:1px solid rgba(108,71,255,.5);
+  backdrop-filter:blur(12px);border-radius:999px;padding:6px 18px;
+  width:fit-content;margin:0 auto 1.25rem;
+  animation:fadeDown .6s ease both;
+}
+.badge i{font-size:13px;color:#a78bfa;}
+.badge span{font-size:11px;font-weight:700;color:#c4b5fd;letter-spacing:.1em;text-transform:uppercase;}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-12px);}to{opacity:1;transform:translateY(0);}}
+.card{
+  background:rgba(255,255,255,.06);backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.12);border-radius:28px;overflow:hidden;
+  animation:fadeUp .7s ease .1s both;
+  box-shadow:0 40px 80px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.1);
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.hero{
+  padding:2.25rem 2rem 3rem;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,rgba(108,71,255,.6) 0%,rgba(167,139,250,.4) 60%,rgba(20,184,166,.3) 100%);
+}
+.hero-glow{
+  position:absolute;width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.12) 0%,transparent 70%);
+  top:-80px;right:-60px;pointer-events:none;animation:glowPulse 4s ease-in-out infinite;
+}
+@keyframes glowPulse{0%,100%{transform:scale(1);opacity:.6;}50%{transform:scale(1.2);opacity:1;}}
+.hero-row{display:flex;align-items:center;gap:1.25rem;margin-bottom:1rem;position:relative;}
+.hero-ico{
+  width:64px;height:64px;border-radius:20px;
+  background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  animation:heartbeat 2s ease-in-out infinite;
+}
+@keyframes heartbeat{0%,100%{transform:scale(1);}14%{transform:scale(1.12);}28%{transform:scale(1);}}
+.hero-ico i{font-size:28px;color:#fff;}
+.hero-title{font-size:1.6rem;font-weight:800;color:#fff;line-height:1.15;letter-spacing:-.02em;}
+.hero-sub{font-size:.875rem;color:rgba(255,255,255,.75);margin-top:4px;}
+.prog-track{height:8px;background:rgba(255,255,255,.15);border-radius:999px;overflow:hidden;}
+.prog-fill{
+  height:100%;border-radius:999px;
+  background:linear-gradient(90deg,rgba(255,255,255,.6),rgba(255,255,255,.95));
+  transition:width .4s cubic-bezier(.4,0,.2,1);width:0%;
+  box-shadow:0 0 12px rgba(255,255,255,.4);
+}
+.prog-meta{display:flex;justify-content:space-between;margin-top:.5rem;font-size:11px;color:rgba(255,255,255,.6);font-weight:500;}
+.body{padding:2rem;}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.75rem;}
+.stat{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;padding:.75rem .5rem;text-align:center;
+  transition:transform .2s,background .2s;cursor:default;
+}
+.stat:hover{transform:translateY(-3px);background:rgba(255,255,255,.12);}
+.stat .sv{font-size:1.1rem;font-weight:800;color:#c4b5fd;}
+.stat .sl{font-size:.62rem;font-weight:600;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;}
+.full{grid-column:span 2;}
+.sep{grid-column:span 2;display:flex;align-items:center;gap:.75rem;margin:.25rem 0;}
+.sep-line{flex:1;height:1px;background:rgba(255,255,255,.1);}
+.sep span{font-size:.7rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;}
+.field{display:flex;flex-direction:column;gap:.45rem;}
+.flabel{display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.07em;}
+.flabel i{font-size:.7rem;color:#a78bfa;}
+.ishell{position:relative;display:flex;align-items:center;}
+.ishell input{
+  width:100%;height:48px;padding:0 44px 0 16px;
+  font-family:'Inter',sans-serif;font-size:.95rem;color:#fff;
+  background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);
+  border-radius:14px;transition:border-color .2s,background .2s,box-shadow .2s;outline:none;
+}
+.ishell input::placeholder{color:rgba(255,255,255,.25);font-size:.85rem;}
+.ishell input:focus{border-color:rgba(108,71,255,.8);background:rgba(108,71,255,.12);box-shadow:0 0 0 3px rgba(108,71,255,.2);}
+.ishell input.ok{border-color:rgba(20,184,166,.8);background:rgba(20,184,166,.1);}
+.ishell input.err{border-color:rgba(239,68,68,.8);background:rgba(239,68,68,.1);}
+.vi{position:absolute;right:14px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;}
+.vi.ok{color:#2dd4bf;}.vi.err{color:#f87171;}.vi.show{opacity:1;}
+.hint{font-size:.68rem;color:rgba(255,255,255,.35);}
+.sbtn{
+  grid-column:span 2;width:100%;height:56px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  background:linear-gradient(135deg,#6c47ff 0%,#a78bfa 100%);
+  color:#fff;border:none;border-radius:16px;
+  font-family:'Inter',sans-serif;font-size:1.05rem;font-weight:700;
+  cursor:pointer;transition:transform .2s,box-shadow .2s;
+  margin-top:.5rem;position:relative;overflow:hidden;
+}
+.sbtn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.18) 0%,transparent 60%);opacity:0;transition:opacity .2s;}
+.sbtn:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(108,71,255,.5);}
+.sbtn:hover::before{opacity:1;}
+.sbtn:active{transform:translateY(0);}
+.sbtn .arr{transition:transform .25s;}
+.sbtn:hover .arr{transform:translateX(5px);}
+.sbtn.loading{pointer-events:none;filter:brightness(.85);}
+.sbtn.loading .blabel{opacity:0;}
+.sbtn.loading::after{content:'';position:absolute;width:24px;height:24px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── RESULT ── */
+.result{display:none;margin-top:1.75rem;border-radius:20px;overflow:hidden;animation:popIn .5s cubic-bezier(.34,1.56,.64,1) both;}
+.result.show{display:block;}
+@keyframes popIn{from{opacity:0;transform:scale(.9) translateY(12px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.result.pos{border:2px solid rgba(220,38,38,.6);}
+.result.pos .rhead{background:linear-gradient(135deg,#7f1d1d,#991b1b,#b91c1c);}
+.result.pos .rbody{background:linear-gradient(135deg,rgba(220,38,38,.18),rgba(254,226,226,.06));}
+.result.neg{border:2px solid rgba(22,163,74,.6);}
+.result.neg .rhead{background:linear-gradient(135deg,#14532d,#166534,#15803d);}
+.result.neg .rbody{background:linear-gradient(135deg,rgba(22,163,74,.18),rgba(220,252,231,.06));}
+.rhead{padding:1.5rem;display:flex;align-items:center;gap:1rem;}
+.rico{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid rgba(255,255,255,.3);}
+.rico i{font-size:22px;color:#fff;}
+.rtitle{font-size:1.15rem;font-weight:800;color:#fff;line-height:1.2;}
+.rsub{font-size:.82rem;color:rgba(255,255,255,.75);margin-top:3px;}
+.rbody{padding:1.25rem 1.5rem;}
+.tags{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1rem;}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;font-size:.75rem;font-weight:700;border:1.5px solid;animation:tagPop .4s cubic-bezier(.34,1.56,.64,1) both;letter-spacing:.02em;}
+.tag i{font-size:.7rem;}
+@keyframes tagPop{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
+.tag-danger{background:rgba(220,38,38,.2);color:#fca5a5;border-color:rgba(220,38,38,.4);}
+.tag-warn{background:rgba(234,88,12,.2);color:#fdba74;border-color:rgba(234,88,12,.4);}
+.tag-info{background:rgba(37,99,235,.2);color:#93c5fd;border-color:rgba(37,99,235,.4);}
+.tag-good{background:rgba(22,163,74,.2);color:#86efac;border-color:rgba(22,163,74,.4);}
+.tag-tip{background:rgba(20,184,166,.2);color:#5eead4;border-color:rgba(20,184,166,.4);}
+.tag-life{background:rgba(139,92,246,.2);color:#c4b5fd;border-color:rgba(139,92,246,.4);}
+.rmsg{font-size:.85rem;color:rgba(255,255,255,.75);line-height:1.65;padding-top:.75rem;border-top:1px solid rgba(255,255,255,.1);}
+.disclaimer{margin-top:1.5rem;background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.3);border-radius:14px;padding:14px 16px;display:flex;align-items:flex-start;gap:10px;}
+.disclaimer i{color:#fbbf24;font-size:13px;margin-top:2px;flex-shrink:0;}
+.disclaimer p{font-size:.75rem;color:rgba(255,255,255,.6);line-height:1.6;}
+@media(max-width:520px){
+  .grid{grid-template-columns:1fr;}
+  .full,.sep,.sbtn{grid-column:span 1;}
+  .sep{display:none;}
+  .body{padding:1.25rem;}
+  .stats{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+<div class="particles" id="particles"></div>
+
+<div class="app">
+  <div class="badge">
+    <i class="fas fa-shield-heart"></i>
+    <span>AI Health Screening · Powered by ML</span>
+  </div>
+
+  <div class="card">
+    <div class="hero">
+      <div class="hero-glow"></div>
+      <div class="hero-row">
+        <div class="hero-ico"><i class="fas fa-heartbeat"></i></div>
+        <div>
+          <div class="hero-title">Diabetes Risk<br>Assessment</div>
+          <div class="hero-sub">Enter your biomarkers for instant AI-powered analysis</div>
+        </div>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+      <div class="prog-meta">
+        <span id="progText">0 of 8 fields completed</span>
+        <span id="progPct">0%</span>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="stats">
+        <div class="stat"><div class="sv">8</div><div class="sl">Markers</div></div>
+        <div class="stat"><div class="sv">ML</div><div class="sl">Engine</div></div>
+        <div class="stat"><div class="sv">&lt;1s</div><div class="sl">Result</div></div>
+        <div class="stat"><div class="sv">Free</div><div class="sl">Always</div></div>
+      </div>
+
+      <form method="post" action="/predict" id="riskForm">
+        <div class="grid">
+
+          <div class="sep"><div class="sep-line"></div><span>Reproductive &amp; Metabolic</span><div class="sep-line"></div></div>
+
+          <div class="field">
+            <label class="flabel"><i class="fas fa-baby"></i> Pregnancies</label>
+            <div class="ishell">
+              <input type="text" name="num_preg" placeholder="e.g. 2" data-v="int" data-min="0" data-max="20" value="{{ form_data.num_preg if form_data else '' }}">
+              <i class="fas fa-check vi ok"></i><i class="fas fa-times vi err"></i>
+            </div>
+            <span class="hint">0 for males / never pregnant</span>
+          </div>
+
+          <div class="field">
+            <label class="flabel"><i class="fas fa-tint"></i> Glucose (mg/dL)</label>
+            <div class="ishell">
+              <input type="text" name="glucose_conc" placeholder="e.g. 120" data-v="num" data-min="0" data-max="300" value="{{ form_data.glucose_conc if form_data else '' }}">
+              <i class="fas fa-check vi ok"></i><i class="fas fa-times vi err"></i>
+            </div>
+            <span class="hint">2h oral glucose tolerance test</span>
+          </div>
+
+          <div class="field">
+            <label class="flabel"><i class="fas fa-heart"></i> Blood Pressure</label>
+            <div class="ishell">
+              <input type="text" name="diastolic_bp" placeholder="e.g. 70" data-v="num" data-min="0" data-max="150" value="{{ form_data.diastolic_bp if form_data else '' }}">
+              <i class="fas fa-check vi ok"></i><i class="fas fa-times vi err"></i>
+            </div>
+            <span class="hint">Diastolic pressure (mm Hg)</span>
+          </div>
+
+          <div class="field">
+            <label class="flabel"><i class="fas fa-syringe"></i> Insulin (μU/mL)</label>
+            <div class="ishell">
+              <input type="text" name="insulin" placeholder="e.g. 94" data-v="num" data-min="0" data-max="900" value="{{ form_data.insulin if form_data else '' }}">
+              <i class="fas fa-check vi ok"></i><i class="fas fa-times vi err"></i>
+            </div>
+            <span class="hint">2h serum insulin level</span>
+          </div>
+
+          <div class="sep"><div class="sep-line"></div><span>Biometric &amp; Genetic</span><div class="sep-line"></div></div>
+
+          <div class="field">
+            <label class="flabel"><i class="fas fa-weight"></i> BMI</label>
+            <div class="ishell">
+              <input type="text" name="bmi" placeholder="e.g. 30.5" data-v="dec" data-min="10" data-max="70" value="{{ form_data.bmi if form_data else '' }}">
+              <i class="fas fa-check vi ok"></i><i class="fas fa-times vi err"></i>
+            </div>
+            <span class="hint">Body Mass Index (kg/m²)</span>
+          </div>
+
+          <div class="field">
+            <label class="flabel"><i class="fas fa-dna"></i> Pedigree Score</label>
+            <div class="ishell">
+              <input type="text" name="diab_pred" placeholder="e.g. 0.372" data-v="dec" data-min="0" data-max="3" value="{{ form_data.diab_pred if form_data else '' }}">
+              <i class="fas fa-check vi ok"></i><i class="fas fa-times vi err"></i>
+            </div>
+            <span class="hint">Genetic diabetes risk score</span>
+          </div>
+
+          <div class="field">
+            <label class="flabel"><i class="fas fa-user"></i> Age (years)</label>
+            <div class="ishell">
+              <input type="text" name="age" placeholder="e.g. 33" data-v="int" data-min="1" data-max="120" value="{{ form_data.age if form_data else '' }}">
+              <i class="fas fa-check vi ok"></i><i class="fas fa-times vi err"></i>
+            </div>
+            <span class="hint">Your current age</span>
+          </div>
+
+          <div class="field">
+            <label class="flabel"><i class="fas fa-ruler-vertical"></i> Skin Thickness</label>
+            <div class="ishell">
+              <input type="text" name="skin" placeholder="e.g. 20" data-v="num" data-min="0" data-max="100" value="{{ form_data.skin if form_data else '' }}">
+              <i class="fas fa-check vi ok"></i><i class="fas fa-times vi err"></i>
+            </div>
+            <span class="hint">Triceps skin fold (mm)</span>
+          </div>
+
+          <button type="submit" class="sbtn full" id="submitBtn">
+            <span class="blabel"><i class="fas fa-brain"></i>&nbsp;&nbsp;Analyze My Risk&nbsp;&nbsp;<i class="fas fa-arrow-right arr"></i></span>
+          </button>
+
+        </div>
+      </form>
+
+      <!-- ═══════════════════════════════════════════════════
+           RESULT SECTION
+           prediction_text must be exactly:
+             "Diabetic"   → shows red / positive result
+             "Healthy"    → shows green / negative result
+           Make sure your app.py returns one of these two exact strings.
+      ════════════════════════════════════════════════════ -->
+
+      {% if prediction_text %}
+
+        {% if prediction_text == "Diabetic" %}
+        <!-- ───── POSITIVE: DIABETIC ───── -->
+        <div class="result show pos" id="resultBox">
+          <div class="rhead">
+            <div class="rico"><i class="fas fa-exclamation-triangle"></i></div>
+            <div>
+              <div class="rtitle">High Diabetes Risk Detected</div>
+              <div class="rsub">Your biomarkers indicate elevated risk — please take action</div>
+            </div>
+          </div>
+          <div class="rbody">
+            <div class="tags">
+              <span class="tag tag-danger" style="animation-delay:.05s"><i class="fas fa-user-md"></i> Consult a Doctor</span>
+              <span class="tag tag-danger" style="animation-delay:.1s"><i class="fas fa-vials"></i> Get Lab Tests Done</span>
+              <span class="tag tag-warn" style="animation-delay:.15s"><i class="fas fa-apple-alt"></i> Review Your Diet</span>
+              <span class="tag tag-warn" style="animation-delay:.2s"><i class="fas fa-running"></i> Increase Exercise</span>
+              <span class="tag tag-info" style="animation-delay:.25s"><i class="fas fa-calendar-check"></i> Schedule Follow-up</span>
+              <span class="tag tag-info" style="animation-delay:.3s"><i class="fas fa-pills"></i> Discuss Medication</span>
+            </div>
+            <p class="rmsg">
+              <i class="fas fa-info-circle" style="color:#f87171;margin-right:6px;"></i>
+              Based on the biomarkers provided, our model has identified a
+              <strong style="color:#fca5a5;">high probability of diabetes</strong>.
+              This is not a formal diagnosis — please consult a qualified endocrinologist or
+              general physician as soon as possible. Early intervention and lifestyle changes
+              can significantly reduce the risk of long-term complications.
+            </p>
+          </div>
+        </div>
+
+        {% else %}
+        <!-- ───── NEGATIVE: HEALTHY ───── -->
+        <div class="result show neg" id="resultBox">
+          <div class="rhead">
+            <div class="rico"><i class="fas fa-check-circle"></i></div>
+            <div>
+              <div class="rtitle">You're Looking Healthy!</div>
+              <div class="rsub">No significant diabetes risk detected — keep it up!</div>
+            </div>
+          </div>
+          <div class="rbody">
+            <div class="tags">
+              <span class="tag tag-good" style="animation-delay:.05s"><i class="fas fa-smile"></i> No Need to Worry</span>
+              <span class="tag tag-good" style="animation-delay:.1s"><i class="fas fa-check-double"></i> All Clear</span>
+              <span class="tag tag-tip" style="animation-delay:.15s"><i class="fas fa-salad"></i> Eat Balanced Meals</span>
+              <span class="tag tag-tip" style="animation-delay:.2s"><i class="fas fa-dumbbell"></i> Stay Active</span>
+              <span class="tag tag-life" style="animation-delay:.25s"><i class="fas fa-moon"></i> Prioritize Sleep</span>
+              <span class="tag tag-life" style="animation-delay:.3s"><i class="fas fa-calendar-alt"></i> Annual Checkup</span>
+            </div>
+            <p class="rmsg">
+              <i class="fas fa-heart" style="color:#86efac;margin-right:6px;"></i>
+              Great news! Your health metrics suggest a
+              <strong style="color:#86efac;">low risk of diabetes</strong> at this time.
+              Continue maintaining a healthy lifestyle — balanced nutrition, regular physical
+              activity, and adequate sleep go a long way. We recommend routine annual checkups
+              to stay on top of your health over time.
+            </p>
+          </div>
+        </div>
+        {% endif %}
+
+      {% endif %}
+      <!-- ═══════════════════════════════════════════════════ -->
+
+      <div class="disclaimer">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>This tool provides a statistical estimate only and does not replace professional medical advice. Always consult a qualified healthcare provider for diagnosis and treatment decisions.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const pc=document.getElementById('particles');
+  for(let i=0;i<25;i++){
+    const p=document.createElement('div');p.className='p';
+    p.style.cssText='left:'+Math.random()*100+'%;width:'+(Math.random()*3+1.5)+'px;height:'+(Math.random()*3+1.5)+'px;animation-duration:'+(Math.random()*15+10)+'s;animation-delay:'+(Math.random()*15)+'s;opacity:'+(Math.random()*.4+.1)+';';
+    pc.appendChild(p);
+  }
+
+  const form=document.getElementById('riskForm');
+  const inputs=Array.from(form.querySelectorAll('input[type="text"]'));
+  const progFill=document.getElementById('progFill');
+  const progText=document.getElementById('progText');
+  const progPct=document.getElementById('progPct');
+  const submitBtn=document.getElementById('submitBtn');
+  const resultBox=document.getElementById('resultBox');
+
+  function validate(inp){
+    const v=inp.value.trim();
+    const shell=inp.closest('.ishell');
+    const ok=shell.querySelector('.vi.ok');
+    const err=shell.querySelector('.vi.err');
+    if(!v){inp.classList.remove('ok','err');ok.classList.remove('show');err.classList.remove('show');return null;}
+    const t=inp.dataset.v,mn=parseFloat(inp.dataset.min),mx=parseFloat(inp.dataset.max);
+    let valid=false;
+    if(t==='int') valid=/^\d+$/.test(v)&&+v>=mn&&+v<=mx;
+    else valid=/^\d*\.?\d+$/.test(v)&&+v>=mn&&+v<=mx;
+    inp.classList.toggle('ok',valid);inp.classList.toggle('err',!valid);
+    ok.classList.toggle('show',valid);err.classList.toggle('show',!valid);
+    return valid;
+  }
+
+  function updateProg(){
+    const filled=inputs.filter(i=>i.value.trim()!=='').length;
+    const pct=Math.round((filled/inputs.length)*100);
+    progFill.style.width=pct+'%';
+    progText.textContent=filled+' of '+inputs.length+' fields completed';
+    progPct.textContent=pct+'%';
+  }
+
+  inputs.forEach(inp=>{
+    inp.addEventListener('input',()=>{updateProg();validate(inp);});
+    inp.addEventListener('blur',()=>validate(inp));
+    if(inp.value.trim()) validate(inp);
+  });
+  updateProg();
+
+  form.addEventListener('submit',function(e){
+    let allOk=true;
+    inputs.forEach(inp=>{const r=validate(inp);if(r===null||r===false)allOk=false;});
+    const empty=inputs.filter(i=>!i.value.trim());
+    if(empty.length){
+      e.preventDefault();empty[0].focus();
+      empty.forEach(i=>{i.classList.add('err');i.closest('.ishell').querySelector('.vi.err').classList.add('show');});
+      return;
+    }
+    if(!allOk){e.preventDefault();return;}
+    submitBtn.classList.add('loading');
+  });
+
+  if(resultBox&&resultBox.classList.contains('show')){
+    setTimeout(()=>resultBox.scrollIntoView({behavior:'smooth',block:'center'}),500);
+  }
+})();
+</script>
+</body>
+</html>
